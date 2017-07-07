@@ -1,6 +1,6 @@
 'use strict';
 
-const EventEmitter = require('events');
+const EventEmitter = require('EventEmitter');
 
 const devtools = require('./lib/devtools');
 const Chrome = require('./lib/chrome');
@@ -13,10 +13,14 @@ module.exports = function (options, callback) {
     const notifier = new EventEmitter();
     if (typeof callback === 'function') {
         // allow to register the error callback later
-        process.nextTick(function () {
-            new Chrome(options, notifier);
-        });
-        return notifier.once('connect', callback);
+        // process.nextTick(function () {
+        //     new Chrome(options, notifier);
+        // });
+        setImmediate(function () {
+             new Chrome(options, notifier);
+        })
+        notifier.once('connect', callback);
+        return notifier
     } else {
         return new Promise(function (fulfill, reject) {
             notifier.once('connect', fulfill);
